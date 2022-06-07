@@ -1,28 +1,25 @@
-use std::{fs, fs::File};
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
+use std::{fs, fs::File};
 
 fn main() -> io::Result<()> {
-   let big_dir = ".";
+    let big_dir = ".";
 
-   let path = Path::new(big_dir)
-       .canonicalize()
-       .unwrap()
-       .join("test");
+    let path = Path::new(big_dir).canonicalize().unwrap();
 
-   generate_dotfiles(&path)?;
+    generate_dotfiles(&path)?;
 
-   generate_directories(&path)?;
+    generate_directories(&path)?;
 
-   generate_boilerplate(&path)?;
+    generate_boilerplate(&path)?;
 
-   Ok(())
+    Ok(())
 }
 
 fn generate_dotfiles(dir: &Path) -> io::Result<()> {
     let _file = File::create(dir.join(".nojekyll"))?;
-    
+
     let mut file = File::create(dir.join(".gitignore"))?;
     let bytes = include_bytes!("assets/.gitignore");
     file.write_all(bytes)?;
@@ -64,4 +61,3 @@ fn generate_boilerplate(dir: &Path) -> io::Result<()> {
 
     Ok(())
 }
-

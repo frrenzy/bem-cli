@@ -2,9 +2,16 @@
 
 Generates basic nested BEM file structure and some boilerplate code
 
+### Pre-requisites
+
+```sh
+curl
+wget
+```
+
 ### Installation
 
-```bas.
+```sh
 sh -c "$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/install.sh)"
 ```
 

@@ -32,4 +32,9 @@ fi
 wget $URL
 
 chmod +x $NAME
-mv $NAME /usr/local/bin/bem
+
+mkdir -p "$HOME/bin"
+
+mv $NAME "$HOME/bin/bem"
+
+export PATH="$HOME/bin:$PATH"

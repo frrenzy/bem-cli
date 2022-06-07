@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/zsh
 
 set -e
 
@@ -33,8 +33,8 @@ wget $URL
 
 chmod +x $NAME
 
-mkdir -p "${HOME}/bin"
+#mkdir -p "${HOME}/bin"
 
-mv $NAME "${HOME}/bin/bem"
+mv $NAME /usr/local/bin/bem
 
-export PATH="${HOME}/bin:${PATH}"
+#export PATH="${HOME}/bin:${PATH}"

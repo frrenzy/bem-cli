@@ -7,12 +7,13 @@ Generates basic nested BEM file structure and some boilerplate code
 ```sh
 curl
 wget
+zsh
 ```
 
 ### Installation
 
 ```sh
-sh -c "$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/install.sh)"
+zsh -c "$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/install.sh)"
 ```
 
 ### How to use

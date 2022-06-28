@@ -29,7 +29,7 @@ else
   NAME="bem_deb"
 fi
 
-echo "$URL"
+wget "$URL"
 
 chmod +x $NAME
 rm -rf /usr/local/bin/bem

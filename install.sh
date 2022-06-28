@@ -36,4 +36,4 @@ rm -rf /usr/local/bin/bem
 rm -rf $HOME/bin/bem
 mv $NAME $HOME/bin/bem
 export PATH=$HOME/bin/bem:$PATH
-echo "export PATH=/usr/local/bin/bem:$PATH" >> ~/.zshrc
+echo "export PATH=$HOME/bin/bem:$PATH" >> ~/.zshrc

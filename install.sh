@@ -33,6 +33,6 @@ wget "$URL"
 
 chmod a+rx $NAME
 rm -rf /usr/local/bin/bem
-sudo mv $NAME /usr/local/bin/bem
-export PATH=/usr/local/bin/bem:$PATH
+mv $NAME $HOME/bin/bem
+export PATH=$HOME/bin/bem:$PATH
 echo "export PATH=/usr/local/bin/bem:$PATH" >> ~/.zshrc

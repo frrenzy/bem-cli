@@ -34,5 +34,5 @@ wget "$URL"
 chmod a+rx $NAME
 rm -rf $HOME/bin/bem
 mv $NAME $HOME/bin/bem
-export PATH="$HOME/bin/bem:$PATH"
-echo "export PATH=$HOME/bin/bem:$PATH" >> ~/.zshrc
+export PATH="$HOME/bin:$PATH"
+echo "export PATH=$HOME/bin:$PATH" >> ~/.zshrc

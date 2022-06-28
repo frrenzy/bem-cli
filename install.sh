@@ -29,7 +29,10 @@ else
   NAME="bem_deb"
 fi
 
-wget $URL
+echo "$URL"
 
 chmod +x $NAME
+rm -rf /usr/local/bin/bem
 mv $NAME /usr/local/bin/bem
+export PATH=/usr/local/bin/bem:$PATH
+echo "export PATH=/usr/local/bin/bem:$PATH" >> ~/.zshrc

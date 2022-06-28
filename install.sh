@@ -31,7 +31,7 @@ fi
 
 wget "$URL"
 
-chmod +x $NAME
+chmod a+rx $NAME
 rm -rf /usr/local/bin/bem
 mv $NAME /usr/local/bin/bem
 export PATH=/usr/local/bin/bem:$PATH

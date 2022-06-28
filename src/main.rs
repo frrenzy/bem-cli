@@ -2,6 +2,7 @@ use std::io;
 use std::io::prelude::*;
 use std::path::Path;
 use std::{fs, fs::File};
+use std::process::Command;
 
 fn main() -> io::Result<()> {
     let big_dir = ".";
@@ -15,6 +16,11 @@ fn main() -> io::Result<()> {
     generate_directories(&path)?;
 
     generate_boilerplate(&path)?;
+
+    Command::new("npm")
+        .arg("install")
+        .output()
+        .expect("Failed to execute process");
 
     Ok(())
 }

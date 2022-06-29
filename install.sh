@@ -32,7 +32,13 @@ fi
 wget "$URL"
 
 chmod a+rx $NAME
-rm -rf $HOME/bin/bem
+
+if [ -d "$HOME/bin" ]; then
+  rm -rf $HOME/bin/bem
+else
+  mkdir "$HOME/bin"
+fi
+
 mv $NAME $HOME/bin/bem
 export PATH="$HOME/bin:$PATH"
 echo "export PATH=$HOME/bin:$PATH" >> ~/.zshrc

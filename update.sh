@@ -1,4 +1,12 @@
+#!/bin/zsh
 set -e
+
+VERSION=$(curl -s https://api.github.com/repos/frrenzy/bem-cli/releases/latest \
+                                         | grep tag_name \
+                                         | cut -d : -f 2,3 \
+                                         | tr -d \" \
+                                         | tr -d \, \
+                                         | awk '{print substr($0, 2)}')
 
 URLS=("${(@f)$(curl -s https://api.github.com/repos/frrenzy/bem-cli/releases/latest \
                                  | grep browser_download_url \
@@ -37,4 +45,6 @@ else
   mkdir "$HOME/bin"
 fi
 
-mv $NAME $HOME/bin/bem
+mv $NAME "$HOME/bin/bem"
+
+echo "$VERSION"

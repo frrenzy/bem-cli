@@ -75,14 +75,11 @@ fn main() -> io::Result<()> {
 }
 
 fn update() -> io::Result<()> {
-    let output = Command::new("zsh")
+    Command::new("zsh")
         .arg("-c")
         .arg("$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)")
-        .output()
+        .spawn()
         .expect("Unable to update :(. Reinstall via install command: https://github.com/frrenzy/bem-cli");
-
-    println!("Successfully updated! New version:");
-    io::stdout().write(&output.stdout).unwrap();
 
     Ok(())
 }

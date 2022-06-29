@@ -82,7 +82,7 @@ fn update() -> io::Result<()> {
         .expect("Unable to update :(. Reinstall via install command: https://github.com/frrenzy/bem-cli");
 
     println!("Successfully updated! New version:");
-    io::stdout().write_all(&output.stdout).unwrap();
+    io::stdout().write(&output.stdout).unwrap();
 
     Ok(())
 }

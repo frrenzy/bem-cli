@@ -1,9 +1,9 @@
-use std::io;
 use std::env;
+use std::io;
 use std::io::prelude::*;
 use std::path::Path;
-use std::{fs, fs::File};
 use std::process::Command;
+use std::{fs, fs::File};
 
 fn main() -> io::Result<()> {
     let big_dir = ".";
@@ -14,63 +14,58 @@ fn main() -> io::Result<()> {
         1 => {
             eprintln!("Error: missing command");
             help();
-        },
-        2 => {
-            match &args[1][..] {
-                "update" => println!("Update bem-cli via this command:
-zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"),
-                "create" => {
-                    create_bem(&path)?;
-                    loop {
-                        println!("Do you want to install dependencies? [yn]");
+        }
+        2 => match &args[1][..] {
+            "update" => println!(
+                "Update bem-cli via this command:
+zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
+            ),
+            "create" => {
+                create_bem(&path)?;
+                loop {
+                    println!("Do you want to install dependencies? [yn]");
 
-                        let mut answer = String::new();
+                    let mut answer = String::new();
 
-                        io::stdin()
-                            .read_line(&mut answer)
-                            .expect("Failed to read answer");
+                    io::stdin()
+                        .read_line(&mut answer)
+                        .expect("Failed to read answer");
 
-                        match &answer.trim()[..] {
-                            "y" => {
-                                install()?;
-                                break
-                            },
-                            "n" => break,
-                            _ => println!("Answer should be y or n"),
+                    match &answer.trim()[..] {
+                        "y" => {
+                            install()?;
+                            break;
                         }
+                        "n" => break,
+                        _ => println!("Answer should be y or n"),
                     }
-                },
-                "version" => println!("{}", env!("CARGO_PKG_VERSION")),
-                _ => {
-                    eprintln!("Error: invalid command");
-                    help();
-                },
+                }
+            }
+            "version" => println!("{}", env!("CARGO_PKG_VERSION")),
+            _ => {
+                eprintln!("Error: invalid command");
+                help();
             }
         },
-        3 => {
-            match &args[1][..] {
-                "create" => {
-                    match &args[2][..] {
-                        "-i" => create_bem_install(&path)?,
-                        "--install" => create_bem_install(&path)?,
-                        _ => {
-                            eprintln!("Error: invalid command");
-                            help();
-                        },
-                    }
-                },
+        3 => match &args[1][..] {
+            "create" => match &args[2][..] {
+                "-i" => create_bem_install(&path)?,
+                "--install" => create_bem_install(&path)?,
                 _ => {
                     eprintln!("Error: invalid command");
                     help();
-                },
+                }
+            },
+            _ => {
+                eprintln!("Error: invalid command");
+                help();
             }
         },
         _ => {
             eprintln!("Error: invalid command");
             help();
-        },
+        }
     }
-
 
     Ok(())
 }
@@ -151,7 +146,6 @@ fn generate_boilerplate(dir: &Path) -> io::Result<()> {
     let bytes = include_bytes!("assets/webpack.config.js");
     file.write_all(bytes)?;
 
-
     let mut file = File::create(dir.join("src/index.html"))?;
     let bytes = include_bytes!("assets/index.html");
     file.write_all(bytes)?;
@@ -172,7 +166,8 @@ fn generate_boilerplate(dir: &Path) -> io::Result<()> {
 }
 
 fn help() {
-    println!("usage:
+    println!(
+        "usage:
 bem version
     Shows version.
 bem update
@@ -180,5 +175,6 @@ bem update
 bem create <option>
     Generates BEM project in current empty folder.
     Optional argument:
-        -i, --install: install dependencies automatically");
+        -i, --install: install dependencies automatically"
+    );
 }

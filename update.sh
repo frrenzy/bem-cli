@@ -1,5 +1,3 @@
-#!/bin/zsh
-
 set -e
 
 URLS=("${(@f)$(curl -s https://api.github.com/repos/frrenzy/bem-cli/releases/latest \

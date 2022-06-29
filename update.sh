@@ -1,4 +1,3 @@
-#!/bin/zsh
 set -e
 
 VERSION=$(curl -s https://api.github.com/repos/frrenzy/bem-cli/releases/latest \

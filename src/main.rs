@@ -17,7 +17,8 @@ fn main() -> io::Result<()> {
         },
         2 => {
             match &args[1][..] {
-                "update" => update()?,
+                "update" => println!("Update bem-cli via this command:
+zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"),
                 "create" => {
                     create_bem(&path)?;
                     loop {
@@ -74,16 +75,6 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn update() -> io::Result<()> {
-    Command::new("zsh")
-        .arg("-c")
-        .arg("$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)")
-        .spawn()
-        .expect("Unable to update :(. Reinstall via install command: https://github.com/frrenzy/bem-cli");
-
-    Ok(())
-}
-
 fn create_bem_install(dir: &Path) -> io::Result<()> {
     create_bem(&dir)?;
 
@@ -93,6 +84,8 @@ fn create_bem_install(dir: &Path) -> io::Result<()> {
 }
 
 fn install() -> io::Result<()> {
+    println!("Installing dependencies:");
+
     Command::new("npm")
         .arg("install")
         .spawn()
@@ -107,6 +100,8 @@ fn create_bem(dir: &Path) -> io::Result<()> {
     generate_directories(&dir)?;
 
     generate_boilerplate(&dir)?;
+
+    println!("Done!");
 
     Ok(())
 }

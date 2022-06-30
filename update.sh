@@ -39,11 +39,7 @@ wget "$URL"
 
 chmod a+rx $NAME
 
-if [ -d "$HOME/bin" ]; then
-  rm -rf $HOME/bin/bem
-else
-  mkdir "$HOME/bin"
-fi
+rm $HOME/bin/bem
 
 mv $NAME "$HOME/bin/bem"
 

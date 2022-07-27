@@ -158,7 +158,7 @@ fn generate_boilerplate(dir: &Path) -> io::Result<()> {
     let bytes = include_bytes!("assets/normalize.css");
     file.write_all(bytes)?;
 
-    let _file = File::create(dir.join("src/components/index.js"))?;
+    let _file = File::create(dir.join("src/pages/index.js"))?;
     let bytes = include_bytes!("assets/index.js");
     file.write_all(bytes)?;
 

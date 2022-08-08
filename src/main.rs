@@ -33,14 +33,14 @@ zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
 
                     match &answer.trim()[..] {
                         "y" => {
-                            install()?;
+                            get_package_manager()?;
                             break;
                         }
                         "n" => break,
                         _ => println!("Answer should be y or n"),
                     }
                 }
-            }
+            } 
             "version" => println!("{}", env!("CARGO_PKG_VERSION")),
             _ => {
                 eprintln!("Error: invalid command");
@@ -73,15 +73,42 @@ zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
 fn create_bem_install(dir: &Path) -> io::Result<()> {
     create_bem(&dir)?;
 
-    install()?;
+    get_package_manager()?;
 
     Ok(())
 }
 
-fn install() -> io::Result<()> {
+fn get_package_manager() -> io::Result<()> {
+    loop {
+        println!("Do you want to use yarn or npm?");
+
+        let mut answer = String::new();
+
+        io::stdin()
+            .read_line(&mut answer)
+            .expect("Failed to read answer");
+
+        match &answer.trim()[..] {
+            "yarn" => {
+                install("yarn")?;
+                break;
+            }
+            "npm" => {
+                install("npm")?;
+                break;
+            }
+            _ => println!("Answer should be yarn or npm"),
+        }
+    }
+
+    Ok(())
+}
+
+fn install(manager: &str) -> io::Result<()> {
+
     println!("Installing dependencies:");
 
-    Command::new("npm")
+    Command::new(manager)
         .arg("install")
         .spawn()
         .expect("Failed to install dependencies");
@@ -90,6 +117,12 @@ fn install() -> io::Result<()> {
 }
 
 fn create_bem(dir: &Path) -> io::Result<()> {
+
+    Command::new("git")
+        .arg("init")
+        .spawn()
+        .expect("Failed to initialize repository");
+
     generate_dotfiles(&dir)?;
 
     generate_directories(&dir)?;

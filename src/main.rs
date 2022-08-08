@@ -22,11 +22,11 @@ zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
             ),
             "create" => {
                 create_bem(&path)?;
+
+                println!("Do you want to install dependencies? [yn]");
+
                 loop {
-                    println!("Do you want to install dependencies? [yn]");
-
                     let mut answer = String::new();
-
                     io::stdin()
                         .read_line(&mut answer)
                         .expect("Failed to read answer");
@@ -110,7 +110,7 @@ fn install(manager: &str) -> io::Result<()> {
 
     Command::new(manager)
         .arg("install")
-        .spawn()
+        .status()
         .expect("Failed to install dependencies");
 
     Ok(())
@@ -120,7 +120,7 @@ fn create_bem(dir: &Path) -> io::Result<()> {
 
     Command::new("git")
         .arg("init")
-        .spawn()
+        .output()
         .expect("Failed to initialize repository");
 
     generate_dotfiles(&dir)?;

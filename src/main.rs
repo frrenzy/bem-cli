@@ -1,11 +1,15 @@
+mod version;
+
+use crate::version::check_updates;
 use std::env;
+use std::error::Error;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
 use std::process::Command;
 use std::{fs, fs::File};
 
-fn main() -> io::Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     let big_dir = ".";
     let args: Vec<String> = env::args().collect();
     let path = Path::new(big_dir).canonicalize().unwrap();
@@ -16,10 +20,7 @@ fn main() -> io::Result<()> {
             help();
         }
         2 => match &args[1][..] {
-            "update" => println!(
-                "Update bem-cli via this command:
-zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
-            ),
+            "update" => version()?, 
             "create" => {
                 create_bem(&path)?;
 
@@ -40,8 +41,8 @@ zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
                         _ => println!("Answer should be y or n"),
                     }
                 }
-            } 
-            "version" => println!("{}", env!("CARGO_PKG_VERSION")),
+            }
+            "version" => version()?,
             _ => {
                 eprintln!("Error: invalid command");
                 help();
@@ -66,6 +67,18 @@ zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
             help();
         }
     }
+
+    Ok(())
+}
+
+fn version() -> Result<(), Box<dyn Error>> {
+    if check_updates()? {
+        println!(
+            "zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
+        )
+    } else {
+        println!("aboba")
+    };
 
     Ok(())
 }
@@ -105,7 +118,6 @@ fn get_package_manager() -> io::Result<()> {
 }
 
 fn install(manager: &str) -> io::Result<()> {
-
     println!("Installing dependencies:");
 
     Command::new(manager)
@@ -117,7 +129,6 @@ fn install(manager: &str) -> io::Result<()> {
 }
 
 fn create_bem(dir: &Path) -> io::Result<()> {
-
     Command::new("git")
         .arg("init")
         .output()
@@ -204,7 +215,7 @@ fn help() {
 bem version
     Shows version.
 bem update
-    Downloads new version.
+    Checks for updates.
 bem create <option>
     Generates BEM project in current empty folder.
     Optional argument:

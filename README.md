@@ -18,4 +18,6 @@ zsh -c "$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/install.sh)"
 
 ### How to use
 
-Just `cd` into desired folder and run `bem`.
+- `bem create` - scaffolds BEM project inside current directory
+- `bem version` - shows current version
+- `bem update` - checks for updates

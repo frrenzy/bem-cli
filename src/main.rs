@@ -1,11 +1,13 @@
 mod version;
 
-use std::io;
-use std::io::prelude::*;
-use std::path::Path;
-use std::process::Command;
-use std::{env, error::Error};
-use std::{fs, fs::File};
+use std::{
+    fs::{self, File}, 
+    path::Path,
+    io::{self, prelude::*},
+    process::Command,
+    env,
+    error::Error,
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let big_dir = ".";

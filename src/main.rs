@@ -1,18 +1,16 @@
 mod version;
 
-use crate::version::check_updates;
-use std::env;
-use std::error::Error;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
 use std::process::Command;
+use std::{env, error::Error};
 use std::{fs, fs::File};
 
 fn main() -> Result<(), Box<dyn Error>> {
     let big_dir = ".";
     let args: Vec<String> = env::args().collect();
-    let path = Path::new(big_dir).canonicalize().unwrap();
+    let path = Path::new(big_dir).canonicalize()?;
 
     match args.len() {
         1 => {
@@ -20,7 +18,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             help();
         }
         2 => match &args[1][..] {
-            "update" => version()?, 
+            "update" => handle_version()?,
             "create" => {
                 create_bem(&path)?;
 
@@ -42,7 +40,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     }
                 }
             }
-            "version" => version()?,
+            "version" => handle_version()?,
             _ => {
                 eprintln!("Error: invalid command");
                 help();
@@ -71,13 +69,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn version() -> Result<(), Box<dyn Error>> {
-    if check_updates()? {
-        println!(
-            "zsh -c $(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)"
-        )
-    } else {
-        println!("aboba")
+fn handle_version() -> Result<(), Box<dyn Error>> {
+    if version::check_updates()? {
+        println!("zsh -c \"$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)\"")
     };
 
     Ok(())

@@ -1,12 +1,14 @@
+mod cli_io;
+mod component;
 mod version;
 
 use std::{
-    fs::{self, File}, 
-    path::Path,
-    io::{self, prelude::*},
-    process::Command,
     env,
     error::Error,
+    fs::{self, File},
+    io::{self, prelude::*},
+    path::Path,
+    process::Command,
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -24,22 +26,9 @@ fn main() -> Result<(), Box<dyn Error>> {
             "create" => {
                 create_bem(&path)?;
 
-                println!("Do you want to install dependencies? [yn]");
-
-                loop {
-                    let mut answer = String::new();
-                    io::stdin()
-                        .read_line(&mut answer)
-                        .expect("Failed to read answer");
-
-                    match &answer.trim()[..] {
-                        "y" => {
-                            get_package_manager()?;
-                            break;
-                        }
-                        "n" => break,
-                        _ => println!("Answer should be y or n"),
-                    }
+                if cli_io::get_install_flag()? {
+                    let manager = cli_io::get_package_manager()?;
+                    install(manager)?;
                 }
             }
             "version" => handle_version()?,
@@ -57,6 +46,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     help();
                 }
             },
+            "component" => handle_component_create(&path, &args[2])?,
             _ => {
                 eprintln!("Error: invalid command");
                 help();
@@ -71,6 +61,25 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+fn handle_component_create(dir: &Path, name: &String) -> io::Result<()> {
+    let kebab_name = component::pascal_to_kebab(name);
+    let camel_name = component::pascal_to_camel(name);
+    let dir = dir.join("src").join("components").join(&kebab_name[..]);
+    fs::create_dir(&dir)?;
+
+    let _module = File::create(dir.join(format!("{kebab_name}.module.scss")))?;
+
+    let mut index = File::create(dir.join("index.js"))?;
+    index.write_all(format!("export {{ default }} from './{kebab_name}'\n").as_bytes())?;
+
+    let mut component = File::create(dir.join(format!("{kebab_name}.jsx")))?;
+    component.write_all(
+        format!("import {camel_name}Styles from './{kebab_name}.module.scss'\n\nconst {name} = props => {{\n\n}}\n\nexport default {name}").as_bytes(),
+    )?;
+
+    Ok(())
+}
+
 fn handle_version() -> Result<(), Box<dyn Error>> {
     if version::check_updates()? {
         println!("zsh -c \"$(curl -fsSL https://raw.github.com/frrenzy/bem-cli/master/update.sh)\"")
@@ -80,35 +89,10 @@ fn handle_version() -> Result<(), Box<dyn Error>> {
 }
 
 fn create_bem_install(dir: &Path) -> io::Result<()> {
-    create_bem(&dir)?;
+    create_bem(dir)?;
 
-    get_package_manager()?;
-
-    Ok(())
-}
-
-fn get_package_manager() -> io::Result<()> {
-    loop {
-        println!("Do you want to use yarn or npm?");
-
-        let mut answer = String::new();
-
-        io::stdin()
-            .read_line(&mut answer)
-            .expect("Failed to read answer");
-
-        match &answer.trim()[..] {
-            "yarn" => {
-                install("yarn")?;
-                break;
-            }
-            "npm" => {
-                install("npm")?;
-                break;
-            }
-            _ => println!("Answer should be yarn or npm"),
-        }
-    }
+    let manager = cli_io::get_package_manager()?;
+    install(manager)?;
 
     Ok(())
 }
@@ -130,11 +114,11 @@ fn create_bem(dir: &Path) -> io::Result<()> {
         .output()
         .expect("Failed to initialize repository");
 
-    generate_dotfiles(&dir)?;
+    generate_dotfiles(dir)?;
 
-    generate_directories(&dir)?;
+    generate_directories(dir)?;
 
-    generate_boilerplate(&dir)?;
+    generate_boilerplate(dir)?;
 
     println!("Done!");
 
@@ -159,7 +143,7 @@ fn generate_directories(dir: &Path) -> io::Result<()> {
     fs::create_dir(&dir.join("src"))?;
     let bem_struct: [&str; 5] = ["blocks", "images", "pages", "components", "vendor"];
     for folder in bem_struct {
-        fs::create_dir(&dir.join("src").join(&folder))?;
+        fs::create_dir(&dir.join("src").join(folder))?;
     }
 
     Ok(())
@@ -215,6 +199,8 @@ bem update
 bem create <option>
     Generates BEM project in current empty folder.
     Optional argument:
-        -i, --install: install dependencies automatically"
+        -i, --install: install dependencies automatically
+bem component <name>
+    Generates React component with specified name in current/src directory. CSS-module and re-export included!"
     );
 }

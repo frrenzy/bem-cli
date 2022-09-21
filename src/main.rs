@@ -46,7 +46,21 @@ fn main() -> Result<(), Box<dyn Error>> {
                     help();
                 }
             },
-            "component" => handle_component_create(&path, &args[2])?,
+            "component" => handle_component_create(&path, &args[2], "css")?,
+            _ => {
+                eprintln!("Error: invalid command");
+                help();
+            }
+        },
+        4 => match &args[1][..] {
+            "component" => match &args[3][..] {
+                "--sass" => handle_component_create(&path, &args[2], "sass")?,
+                "--scss" => handle_component_create(&path, &args[2], "scss")?,
+                _ => {
+                    eprintln!("Error: invalid command. Use --sass or --scss option to specify CSS preprocessor type");
+                    help();
+                }
+            },
             _ => {
                 eprintln!("Error: invalid command");
                 help();
@@ -61,20 +75,20 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn handle_component_create(dir: &Path, name: &String) -> io::Result<()> {
+fn handle_component_create(dir: &Path, name: &str, css: &str) -> io::Result<()> {
     let kebab_name = component::pascal_to_kebab(name);
     let camel_name = component::pascal_to_camel(name);
     let dir = dir.join("src").join("components").join(&kebab_name[..]);
     fs::create_dir(&dir)?;
 
-    let _module = File::create(dir.join(format!("{kebab_name}.module.scss")))?;
+    let _module = File::create(dir.join(format!("{kebab_name}.module.{css}")))?;
 
     let mut index = File::create(dir.join("index.js"))?;
     index.write_all(format!("export {{ default }} from './{kebab_name}'\n").as_bytes())?;
 
     let mut component = File::create(dir.join(format!("{kebab_name}.jsx")))?;
     component.write_all(
-        format!("import {camel_name}Styles from './{kebab_name}.module.scss'\n\nconst {name} = props => {{\n\n}}\n\nexport default {name}").as_bytes(),
+        format!("import {camel_name}Styles from './{kebab_name}.module.{css}'\n\nconst {name} = props => {{\n\n}}\n\nexport default {name}\n").as_bytes(),
     )?;
 
     Ok(())
@@ -191,7 +205,7 @@ fn generate_boilerplate(dir: &Path) -> io::Result<()> {
 
 fn help() {
     println!(
-        "usage:
+        "\nusage:
 bem version
     Shows version.
 bem update
@@ -199,8 +213,11 @@ bem update
 bem create <option>
     Generates BEM project in current empty folder.
     Optional argument:
-        -i, --install: install dependencies automatically
-bem component <name>
-    Generates React component with specified name in current/src directory. CSS-module and re-export included!"
+        -i, --install: install dependencies automatically.
+bem component <name> <option>
+    Generates React component with specified name in current/src directory. No preprocessors are used by default.
+    Optional argument:
+        --sass: create SASS-module for component
+        --scss: create SCSS-module for component"
     );
 }

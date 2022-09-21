@@ -74,11 +74,10 @@ pub fn check_updates() -> Result<bool, Box<dyn Error>> {
     let cargo_version = env!("CARGO_PKG_VERSION");
     let gh_version = String::from(&response.tag_name[1..]);
 
-    if cargo_version.eq(&response.tag_name[1..]) {
+    if cargo_version.eq(&gh_version) {
         println!("Your version {} is up to date.", cargo_version);
 
         Ok(false)
-
     } else {
         println!(
             "Your version is {}, while latest is {}. Consider updating via this command:",

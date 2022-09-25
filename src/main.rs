@@ -46,16 +46,25 @@ fn main() -> Result<(), Box<dyn Error>> {
                     help();
                 }
             },
-            "component" => handle_component_create(&path, &args[2], "css")?,
+            "component" => handle_component_create(&path, &args[2], "css", "func")?,
+            "class-component" => handle_component_create(&path, &args[2], "css", "class")?,
             _ => {
                 eprintln!("Error: invalid command");
                 help();
-            }
+            },
         },
         4 => match &args[1][..] {
             "component" => match &args[3][..] {
-                "--sass" => handle_component_create(&path, &args[2], "sass")?,
-                "--scss" => handle_component_create(&path, &args[2], "scss")?,
+                "--sass" => handle_component_create(&path, &args[2], "sass", "func")?,
+                "--scss" => handle_component_create(&path, &args[2], "scss", "func")?,
+                _ => {
+                    eprintln!("Error: invalid command. Use --sass or --scss option to specify CSS preprocessor type");
+                    help();
+                }
+            },
+            "class-component" => match &args[3][..] {
+                "--sass" => handle_component_create(&path, &args[2], "sass", "class")?,
+                "--scss" => handle_component_create(&path, &args[2], "scss", "class")?,
                 _ => {
                     eprintln!("Error: invalid command. Use --sass or --scss option to specify CSS preprocessor type");
                     help();
@@ -75,7 +84,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn handle_component_create(dir: &Path, name: &str, css: &str) -> io::Result<()> {
+fn handle_component_create(dir: &Path, name: &str, css: &str, component_type: &str) -> io::Result<()> {
     let kebab_name = component::pascal_to_kebab(name);
     let camel_name = component::pascal_to_camel(name);
     let dir = dir.join("src").join("components").join(&kebab_name[..]);
@@ -87,9 +96,15 @@ fn handle_component_create(dir: &Path, name: &str, css: &str) -> io::Result<()> 
     index.write_all(format!("export {{ default }} from './{kebab_name}'\n").as_bytes())?;
 
     let mut component = File::create(dir.join(format!("{kebab_name}.jsx")))?;
-    component.write_all(
+    match component_type {
+        "func" => component.write_all(
         format!("import {camel_name}Styles from './{kebab_name}.module.{css}'\n\nconst {name} = props => {{\n\n}}\n\nexport default {name}\n").as_bytes(),
-    )?;
+    )?,
+        "class" => component.write_all(
+            format!("import React from 'react'\nimport {camel_name}Styles from './{kebab_name}.module.{css}'\n\nclass {name} extends React.Component {{\n\tconstructor(props) {{\n\t\tsuper(props)\n\t}}\n\n\trender() {{\n\n\t}}\n}}\n\nexport default {name}\n").as_bytes(),
+        )?,
+        _ => {}
+    }
 
     Ok(())
 }
@@ -216,6 +231,11 @@ bem create <option>
         -i, --install: install dependencies automatically.
 bem component <name> <option>
     Generates React component with specified name in current/src directory. No preprocessors are used by default.
+    Optional argument:
+        --sass: create SASS-module for component
+        --scss: create SCSS-module for component
+bem class-component <name> <option>
+    Generates React class-component with specified name in current/src directory. No preprocessors are used by default.
     Optional argument:
         --sass: create SASS-module for component
         --scss: create SCSS-module for component"

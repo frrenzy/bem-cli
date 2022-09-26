@@ -3,12 +3,15 @@
 ```sh
 bem component AppHeader
 ```
+
+**При указании в конце параметра `--sass` или `--scss` будет создан модуль с указанным расширением.**
+
 src  
-├── components  
-│   ├── app-header  
-│   │   ├── app-header.jsx  
-│   │   ├── app-header.module.scss  
-│   │   └── index.js
+├─ components  
+│   ├─ app-header  
+│   │   ├─ app-header.jsx  
+│   │   ├─ app-header.module.css  
+│   │   └─ index.js
 
 
 *app-header.jsx*
@@ -33,7 +36,7 @@ export default AppHeader
 export { default } from './app-header'
 ```
 
-Реэкспорт позволяет в дальнейшем импортировать компонент без дубливания имени
+Реэкспорт позволяет в дальнейшем импортировать компонент без дублирования имени
 ```javascript
 import AppHeader from 'src/components/app-header' // вот так
 import AppHeader from 'src/components/app-header/app-header' // а не так

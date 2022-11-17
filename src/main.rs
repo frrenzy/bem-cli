@@ -47,6 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             },
             "component" => handle_component_create(&path, &args[2], "css", "func")?,
+            "page" => handle_page_create(&path, &args[2], "css", "func")?,
             "class-component" => handle_component_create(&path, &args[2], "css", "class")?,
             _ => {
                 eprintln!("Error: invalid command");
@@ -54,6 +55,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             },
         },
         4 => match &args[1][..] {
+            "page" => match &args[3][..] {
+                "--sass" => handle_page_create(&path, &args[2], "sass", "func")?,
+                "--scss" => handle_page_create(&path, &args[2], "scss", "func")?,
+                _ => {
+                    eprintln!("Error: invalid command. Use --sass or --scss option to specify CSS preprocessor type");
+                    help();
+                }
+            },
             "component" => match &args[3][..] {
                 "--sass" => handle_component_create(&path, &args[2], "sass", "func")?,
                 "--scss" => handle_component_create(&path, &args[2], "scss", "func")?,
@@ -99,6 +108,31 @@ fn handle_component_create(dir: &Path, name: &str, css: &str, component_type: &s
     match component_type {
         "func" => component.write_all(
         format!("import {camel_name}Styles from './{kebab_name}.module.{css}'\n\nconst {name} = props => {{\n\n}}\n\nexport default {name}\n").as_bytes(),
+    )?,
+        "class" => component.write_all(
+            format!("import React from 'react'\nimport {camel_name}Styles from './{kebab_name}.module.{css}'\n\nclass {name} extends React.Component {{\n\tconstructor(props) {{\n\t\tsuper(props)\n\t}}\n\n\trender() {{\n\n\t}}\n}}\n\nexport default {name}\n").as_bytes(),
+        )?,
+        _ => {}
+    }
+
+    Ok(())
+}
+
+fn handle_page_create(dir: &Path, name: &str, css: &str, component_type: &str) -> io::Result<()> {
+    let kebab_name = component::pascal_to_kebab(name);
+    let camel_name = component::pascal_to_camel(name);
+    let dir = dir.join("src").join("pages").join(&kebab_name[..]);
+    fs::create_dir(&dir).expect("aboba");
+
+    let _module = File::create(dir.join(format!("{kebab_name}.module.{css}")))?;
+
+    let mut index = File::create(dir.join("index.js"))?;
+    index.write_all(format!("export {{ default }} from './{kebab_name}'\n").as_bytes())?;
+
+    let mut component = File::create(dir.join(format!("{kebab_name}.jsx")))?;
+    match component_type {
+        "func" => component.write_all(
+        format!("import {camel_name}Styles from './{kebab_name}.module.{css}'\n\nconst {name}Page = props => {{\n\n}}\n\nexport default {name}Page\n").as_bytes(),
     )?,
         "class" => component.write_all(
             format!("import React from 'react'\nimport {camel_name}Styles from './{kebab_name}.module.{css}'\n\nclass {name} extends React.Component {{\n\tconstructor(props) {{\n\t\tsuper(props)\n\t}}\n\n\trender() {{\n\n\t}}\n}}\n\nexport default {name}\n").as_bytes(),
